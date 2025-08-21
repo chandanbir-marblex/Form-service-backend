@@ -5,6 +5,8 @@ const formController = new FormController();
 
 const formRouter = Router();
 
+formRouter.get('/', formController.getAllForms);
+
 formRouter.post('/', formController.createForm);
 
 formRouter.get('/:id', formController.getFormById);

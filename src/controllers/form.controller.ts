@@ -2,8 +2,17 @@ import { Request, Response } from 'express';
 import { Form } from '../models/form.model';
 import { Question } from '../models/question.model';
 import { logger } from '../utils/Logger';
+import { ErrorResponse, SuccessResponse } from '../utils/Response';
 
 class FormController {
+  async getAllForms(req: Request, res: Response) {
+    try {
+      const forms = await Form.find().populate('steps.elements');
+      SuccessResponse(req, res, forms, 200);
+    } catch (error) {
+      ErrorResponse(req, res, error);
+    }
+  }
   async createForm(req: Request, res: Response) {
     const { title, description, theme, steps, settings, published, savedAt } =
       req.body;
