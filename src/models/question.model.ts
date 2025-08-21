@@ -2,7 +2,6 @@ import mongoose, { Schema } from 'mongoose';
 
 const QuestionSchema = new Schema(
   {
-    questionText: { type: String, required: true },
     type: {
       type: String,
       enum: [
@@ -16,14 +15,11 @@ const QuestionSchema = new Schema(
       ],
       required: true,
     },
-    isRequired: { type: Boolean, default: false },
-    // orderIndex: { type: Number },
-    options: [
-      {
-        optionText: { type: String, required: true },
-        orderIndex: { type: Number },
-      },
-    ],
+    name: { type: String },
+    label: { type: String },
+    placeholder: { type: String },
+    validation: { type: Array },
+    required: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

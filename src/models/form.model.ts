@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import mongoose from 'mongoose';
 
 const FormSchema = new mongoose.Schema(
@@ -5,14 +6,17 @@ const FormSchema = new mongoose.Schema(
     // user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     title: { type: String, required: true },
     description: { type: String },
-    isPublic: { type: Boolean, default: true },
-
-    questions: [
+    theme: { type: Object }, // or a dedicated ThemeSchema
+    steps: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Question',
+        id: String,
+        title: String,
+        default: randomUUID(),
+        elements: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
       },
     ],
+    settings: { type: Object },
+    published: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

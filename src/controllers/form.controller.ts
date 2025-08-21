@@ -5,19 +5,30 @@ import { logger } from '../utils/Logger';
 
 class FormController {
   async createForm(req: Request, res: Response) {
-    const { title, description, questions } = req.body;
+    const { title, description, theme, steps, settings, published, savedAt } =
+      req.body;
     try {
-      const questionIds: string[] = [];
-
-      if (questions && questions.length > 0) {
-        const questionDocs = await Question.insertMany(questions);
-        questionIds.push(...questionDocs.map((q: any) => q._id));
+      // Prepare steps with question references
+      const formSteps = [];
+      if (steps && steps.length > 0) {
+        for (const step of steps) {
+          const questionDocs = await Question.insertMany(step.elements);
+          formSteps.push({
+            id: step.id,
+            title: step.title,
+            elements: questionDocs.map((q: any) => q._id),
+          });
+        }
       }
 
       const form = await Form.create({
         title,
         description,
-        questions: questionIds,
+        theme,
+        steps: formSteps,
+        settings,
+        published: published ?? false,
+        savedAt,
       });
       await form.save();
       return res.status(201).json(form);
@@ -30,7 +41,7 @@ class FormController {
     const { id } = req.params;
 
     try {
-      const form = await Form.findById(id).populate('questions');
+      const form = await Form.findById(id).populate('steps.elements');
       if (!form) {
         return res.status(404).json({ message: 'Form not found' });
       }
@@ -59,19 +70,38 @@ class FormController {
 
   async updateFormById(req: Request, res: Response) {
     try {
-      const { title, description, isPublic } = req.body;
-
+      const { title, description, theme, steps, settings, published, savedAt } =
+        req.body;
       console.log('Updating form:', req.params.id);
 
-      const form = await Form.findByIdAndUpdate(
-        req.params.id,
-        {
-          title,
-          description,
-          isPublic,
-        },
-        { new: true }
-      );
+      // If steps are provided, update questions for each step
+      let formSteps = undefined;
+      if (steps && steps.length > 0) {
+        formSteps = [];
+        for (const step of steps) {
+          // Insert new questions for this step
+          const questionDocs = await Question.insertMany(step.elements);
+          formSteps.push({
+            id: step.id,
+            title: step.title,
+            elements: questionDocs.map((q: any) => q._id),
+          });
+        }
+      }
+
+      const updateObj: any = {
+        title,
+        description,
+        theme,
+        settings,
+        published,
+        savedAt,
+      };
+      if (formSteps) updateObj.steps = formSteps;
+
+      const form = await Form.findByIdAndUpdate(req.params.id, updateObj, {
+        new: true,
+      });
 
       if (!form) {
         return res.status(404).json({ message: 'Form not found' });

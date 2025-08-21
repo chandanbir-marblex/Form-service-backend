@@ -3,14 +3,24 @@ import { Request, Response } from 'express';
 export function ErrorResponse(
   req: Request,
   res: Response,
-  error: AppError | Error
+  error: ApiError | Error | any
 ) {
-  if (error instanceof AppError) {
-    return res.status(error.statusCode).json({ error: error.message });
+  if (error instanceof ApiError) {
+    return res
+      .status(error.statusCode)
+      .json({ error: error.message, success: false });
   } else {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res
+      .status(500)
+      .json({ error: 'Internal Server Error', success: false });
   }
 }
-export function SuccessResponse(req: Request, res: Response, data: any) {
-  return res.status(200).json(data);
+export function SuccessResponse(
+  req: Request,
+  res: Response,
+  data: any,
+  statusCode: number = 200,
+  message: string = 'Success'
+) {
+  return res.status(statusCode).json({ message, data, success: true });
 }
