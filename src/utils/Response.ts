@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { ApiError } from './ApiError';
 
 export function ErrorResponse(
   req: Request,

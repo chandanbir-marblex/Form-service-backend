@@ -9,9 +9,8 @@ const FormSchema = new mongoose.Schema(
     theme: { type: Object }, // or a dedicated ThemeSchema
     steps: [
       {
-        id: String,
+        id: { type: String, default: () => randomUUID() },
         title: String,
-        default: randomUUID(),
         elements: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
       },
     ],

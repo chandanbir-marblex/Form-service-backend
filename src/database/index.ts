@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const connectDB = async () => {
   try {
-    const connectionString = `${process.env.MONGODB_URI}/form`;
+    const connectionString = process.env.MONGODB_URI || 'mongodb://localhost:27017/formbuilder';
     console.log(`Connecting to MongoDB at ${connectionString}`);
     const connectionInstance = await mongoose.connect(connectionString);
     console.log(

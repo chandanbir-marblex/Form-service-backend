@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 import jwt, { Secret } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import type { StringValue } from 'ms';
@@ -10,7 +10,19 @@ import {
   SALT_ROUNDS,
 } from '../constants';
 
-const userSchema = new Schema(
+export interface IUser extends Document {
+  username: string;
+  email: string;
+  fullName: string;
+  avatar: string;
+  password: string;
+  refreshToken?: string;
+  isPasswordCorrect(password: string): Promise<boolean>;
+  generateAccessToken(): string;
+  generateRefreshToken(): string;
+}
+
+const userSchema = new Schema<IUser>(
   {
     username: {
       type: String,
@@ -88,4 +100,4 @@ userSchema.methods.generateRefreshToken = function () {
   );
 };
 
-export const User = mongoose.model('User', userSchema);
+export const User = mongoose.model<IUser>('User', userSchema);

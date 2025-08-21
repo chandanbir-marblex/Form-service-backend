@@ -1,11 +1,13 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../models/user.model.js';
-import { ACCESS_TOKEN_SECRET } from '../constants.js';
-import { Request, Response, NextFunction } from 'express';
-import { ErrorResponse } from '../utils/Response.js';
+import { User } from '../models/user.model';
+import { ACCESS_TOKEN_SECRET } from '../constants';
+import { Response, NextFunction } from 'express';
+import { ErrorResponse } from '../utils/Response';
+import { ApiError } from '../utils/ApiError';
+import { AuthenticatedRequest } from '../types';
 
 export const verifyJWT = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -18,7 +20,7 @@ export const verifyJWT = async (
       throw new ApiError('Unauthorized request', 401);
     }
 
-    const decodedToken = jwt.verify(token, ACCESS_TOKEN_SECRET);
+    const decodedToken = jwt.verify(token, ACCESS_TOKEN_SECRET) as any;
 
     const user = await User.findById(decodedToken?._id).select(
       '-password -refreshToken'

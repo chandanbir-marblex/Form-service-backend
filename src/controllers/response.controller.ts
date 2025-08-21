@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { ErrorResponse, SuccessResponse } from '../utils/Response';
 import { Responses } from '../models/response.model';
+import { ApiError } from '../utils/ApiError';
 
 class ResponseController {
   async createResponse(req: Request, res: Response) {
